@@ -12,7 +12,7 @@ namespace Licenta.UI
             InitializeComponent();
 
             var connectionString = "server=.\\SQLEXPRESS;database=Licenta;integrated security=true";
-            var query = "SELECT FirstName, LastName, CardNo FROM Person";
+            var query = "SELECT FirstName, LastName, DateOfBirth, CardNo FROM Person";
             
             this.dataGridView1.DataSource = GetList<Person>(connectionString, query);
         }

@@ -31,6 +31,7 @@
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.FirstName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.LastName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.DateOfBirth = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.CardNo = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
@@ -44,6 +45,7 @@
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.FirstName,
             this.LastName,
+            this.DateOfBirth,
             this.CardNo});
             this.dataGridView1.Location = new System.Drawing.Point(12, 12);
             this.dataGridView1.Name = "dataGridView1";
@@ -61,6 +63,12 @@
             this.LastName.DataPropertyName = "LastName";
             this.LastName.HeaderText = "Last Name";
             this.LastName.Name = "LastName";
+            // 
+            // DateOfBirth
+            // 
+            this.DateOfBirth.DataPropertyName = "DateOfBirth";
+            this.DateOfBirth.HeaderText = "Date of Birth";
+            this.DateOfBirth.Name = "DateOfBirth";
             // 
             // CardNo
             // 
@@ -86,6 +94,7 @@
         private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.DataGridViewTextBoxColumn FirstName;
         private System.Windows.Forms.DataGridViewTextBoxColumn LastName;
+        private System.Windows.Forms.DataGridViewTextBoxColumn DateOfBirth;
         private System.Windows.Forms.DataGridViewTextBoxColumn CardNo;
     }
 }
