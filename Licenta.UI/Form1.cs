@@ -1,5 +1,4 @@
 ﻿using Licenta.Data;
-using Licenta.ORM;
 using System.Windows.Forms;
 
 namespace Licenta.UI
@@ -10,12 +9,10 @@ namespace Licenta.UI
         {
             InitializeComponent();
 
-            var connectionString = "server=.\\SQLEXPRESS;database=Licenta;integrated security=true";
+            var context = new DbContext();
 
-            var db = new Db(connectionString);
-
-            this.dataGridView1.DataSource = db.GetList<Person>("SELECT FirstName, LastName, DateOfBirth, CardNo FROM Person");
-            this.dataGridView2.DataSource = db.GetList<InventoryItem>("SELECT Name, Price, Count FROM Inventory");
+            this.dataGridView1.DataSource = context.GetPersons();
+            this.dataGridView2.DataSource = context.GetInventory();
         }        
     }
 }
