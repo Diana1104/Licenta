@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace Licenta.UI
@@ -11,7 +12,7 @@ namespace Licenta.UI
             InitializeComponent();
 
             var persons = new List<Person>();
-            
+
             var connectionString = "server=.\\SQLEXPRESS;database=Licenta;integrated security=true";
             var query = "SELECT FirstName, LastName, CardNo FROM Person";
 
@@ -21,20 +22,46 @@ namespace Licenta.UI
                 connection.Open();
 
                 var reader = command.ExecuteReader();
-                
+
+                var columns = GetColumns(reader);
+
                 while (reader.Read())
                 {
-                    var person = new Person();
+                    var person = CreatePerson(columns, reader);
 
-                    person.FirstName = reader["FirstName"].ToString();
-                    person.LastName = reader["LastName"].ToString();
-                    person.CardNo = reader["CardNo"].ToString();
-                    
                     persons.Add(person);
                 }
             }
 
             this.dataGridView1.DataSource = persons;
+        }
+
+        private List<string> GetColumns(SqlDataReader reader)
+        {
+            var columns = new List<string>();
+
+            for (int i = 0; i < reader.FieldCount; i++)
+            {
+                columns.Add(reader.GetName(i));
+            }
+
+            return columns;
+        }
+
+        private Person CreatePerson(List<string> columns, SqlDataReader reader)
+        {
+            var person = new Person();
+
+            foreach (var column in columns)
+            {
+                PropertyInfo prop = person.GetType().GetProperty(column, BindingFlags.Public | BindingFlags.Instance);
+                if (null != prop && prop.CanWrite)
+                {
+                    prop.SetValue(person, reader[column], null);
+                }
+            }
+
+            return person;
         }
     }
 }
