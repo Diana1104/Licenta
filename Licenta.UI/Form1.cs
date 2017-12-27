@@ -11,10 +11,15 @@ namespace Licenta.UI
         {
             InitializeComponent();
 
-            var persons = new List<Person>();
-
             var connectionString = "server=.\\SQLEXPRESS;database=Licenta;integrated security=true";
             var query = "SELECT FirstName, LastName, CardNo FROM Person";
+            
+            this.dataGridView1.DataSource = GetPersons(connectionString, query);
+        }
+
+        private List<Person> GetPersons(string connectionString, string query)
+        {
+            var persons = new List<Person>();
 
             using (var connection = new SqlConnection(connectionString))
             using (var command = new SqlCommand(query, connection))
@@ -33,7 +38,7 @@ namespace Licenta.UI
                 }
             }
 
-            this.dataGridView1.DataSource = persons;
+            return persons;
         }
 
         private List<string> GetColumns(SqlDataReader reader)
