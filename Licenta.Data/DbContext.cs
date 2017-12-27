@@ -1,5 +1,6 @@
 ﻿using Licenta.ORM;
 using System.Collections.Generic;
+using System.Configuration;
 
 namespace Licenta.Data
 {
@@ -9,7 +10,8 @@ namespace Licenta.Data
 
         public DbContext()
         {
-            db = new Db("server=.\\SQLEXPRESS;database=Licenta;integrated security=true");
+            var connectionString = ConfigurationManager.ConnectionStrings["Licenta"].ConnectionString;
+            db = new Db(connectionString);
         }
 
         public List<Person> GetPersons()
