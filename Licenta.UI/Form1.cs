@@ -14,12 +14,12 @@ namespace Licenta.UI
             var connectionString = "server=.\\SQLEXPRESS;database=Licenta;integrated security=true";
             var query = "SELECT FirstName, LastName, CardNo FROM Person";
             
-            this.dataGridView1.DataSource = GetPersons(connectionString, query);
+            this.dataGridView1.DataSource = GetList<Person>(connectionString, query);
         }
 
-        private List<Person> GetPersons(string connectionString, string query)
+        private List<T> GetList<T>(string connectionString, string query) where T:new()
         {
-            var persons = new List<Person>();
+            var items = new List<T>();
 
             using (var connection = new SqlConnection(connectionString))
             using (var command = new SqlCommand(query, connection))
@@ -32,13 +32,13 @@ namespace Licenta.UI
 
                 while (reader.Read())
                 {
-                    var person = Create<Person>(columns, reader);
+                    var item = Create<T>(columns, reader);
 
-                    persons.Add(person);
+                    items.Add(item);
                 }
             }
 
-            return persons;
+            return items;
         }
 
         private List<string> GetColumns(SqlDataReader reader)
