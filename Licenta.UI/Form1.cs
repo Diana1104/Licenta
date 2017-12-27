@@ -12,9 +12,9 @@ namespace Licenta.UI
             InitializeComponent();
 
             var connectionString = "server=.\\SQLEXPRESS;database=Licenta;integrated security=true";
-            var query = "SELECT FirstName, LastName, DateOfBirth, CardNo FROM Person";
             
-            this.dataGridView1.DataSource = GetList<Person>(connectionString, query);
+            this.dataGridView1.DataSource = GetList<Person>(connectionString, "SELECT FirstName, LastName, DateOfBirth, CardNo FROM Person");
+            this.dataGridView2.DataSource = GetList<InventoryItem>(connectionString, "SELECT Name, Price, Count FROM Inventory");
         }
 
         private List<T> GetList<T>(string connectionString, string query) where T:new()
