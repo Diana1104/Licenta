@@ -27,7 +27,7 @@ namespace Licenta.UI
 
                 while (reader.Read())
                 {
-                    var person = CreatePerson(columns, reader);
+                    var person = Create<Person>(columns, reader);
 
                     persons.Add(person);
                 }
@@ -48,9 +48,9 @@ namespace Licenta.UI
             return columns;
         }
 
-        private Person CreatePerson(List<string> columns, SqlDataReader reader)
+        private T Create<T>(List<string> columns, SqlDataReader reader) where T: new() 
         {
-            var person = new Person();
+            var person = new T();
 
             foreach (var column in columns)
             {
