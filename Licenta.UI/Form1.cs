@@ -1,4 +1,5 @@
-﻿using Licenta.ORM;
+﻿using Licenta.Data;
+using Licenta.ORM;
 using System.Windows.Forms;
 
 namespace Licenta.UI
