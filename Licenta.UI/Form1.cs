@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Windows.Forms;
 
 namespace Licenta.UI
@@ -9,10 +10,29 @@ namespace Licenta.UI
         {
             InitializeComponent();
 
-            var persons = new List<Person>
+            var persons = new List<Person>();
+            
+            var connectionString = "server=.\\SQLEXPRESS;database=Licenta;integrated security=true";
+            var query = "SELECT FirstName, LastName, CardNo FROM Person";
+
+            using (var connection = new SqlConnection(connectionString))
+            using (var command = new SqlCommand(query, connection))
             {
-                new Person { FirstName="Jon", LastName="Snow",CardNo="1234" }
-            };
+                connection.Open();
+
+                var reader = command.ExecuteReader();
+                
+                while (reader.Read())
+                {
+                    var person = new Person();
+
+                    person.FirstName = reader["FirstName"].ToString();
+                    person.LastName = reader["LastName"].ToString();
+                    person.CardNo = reader["CardNo"].ToString();
+                    
+                    persons.Add(person);
+                }
+            }
 
             this.dataGridView1.DataSource = persons;
         }
