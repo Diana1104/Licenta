@@ -14,7 +14,7 @@ namespace Licenta.ORM
             this.connectionString = connectionString;
         }
 
-        public List<T> GetList<T>() where T : new()
+        public List<T> GetAll<T>() where T : new()
         {
             var tableName = typeof(T).Name;
             var columns = typeof(T).GetProperties().Select(p => p.Name).ToList();
