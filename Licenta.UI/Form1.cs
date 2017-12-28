@@ -20,13 +20,12 @@ namespace Licenta.UI
 
         private void button1_Click(object sender, System.EventArgs e)
         {
-            context.Save(new Person
+            var editPersonForm = new EditPerson();
+            var result = editPersonForm.ShowDialog();
+            if (result == DialogResult.OK)
             {
-                FirstName = Guid.NewGuid().ToString(),
-                LastName = Guid.NewGuid().ToString(),
-                CardNo = Guid.NewGuid().ToString(),
-                DateOfBirth = DateTime.Now
-            });
+                context.Save(editPersonForm.Person);
+            }
 
             this.dataGridView1.DataSource = context.GetPersons();
         }
