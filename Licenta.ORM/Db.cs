@@ -1,23 +1,24 @@
 ﻿using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Reflection;
 
 namespace Licenta.ORM
 {
     public class Db
     {
         private string connectionString;
+        private Descriptor descriptor;
 
         public Db(string connectionString)
         {
             this.connectionString = connectionString;
+            this.descriptor = new Descriptor();
         }
 
         public List<T> GetAll<T>() where T : new()
         {
             var tableName = typeof(T).Name;
-            var columns = typeof(T).GetProperties().Select(p => p.Name).ToList();
+            var columns = descriptor.GetPropertyNames<T>();
             var query = GetSelectStatement(tableName, columns);
 
             var items = new List<T>();
@@ -31,7 +32,7 @@ namespace Licenta.ORM
 
                 while (reader.Read())
                 {
-                    var item = Create<T>(columns, reader);
+                    var item = descriptor.Create<T>(columns, reader);
 
                     items.Add(item);
                 }
@@ -49,20 +50,17 @@ namespace Licenta.ORM
 
         public void Save<T>(T item)
         {
-            var type = item.GetType();
-            PropertyInfo[] properties = type.GetProperties();
-
-            var tableName = type.Name;
-            var columns = properties.Select(p => p.Name).ToList();
+            var tableName = typeof(T).Name;
+            var columns = descriptor.GetPropertyNames<T>();
             var query = GetInsertStatement(tableName, columns);
 
             using (var connection = new SqlConnection(connectionString))
             using (var command = new SqlCommand(query, connection))
             {
-                foreach (PropertyInfo property in properties)
+                var properties = descriptor.GetPropertyNamesAndValues<T>(item);
+                foreach (var property in properties)
                 {
-                    object value = property.GetValue(item);
-                    command.Parameters.AddWithValue(property.Name, value);
+                    command.Parameters.AddWithValue(property.Key, property.Value);
                 }
 
                 connection.Open();
@@ -77,41 +75,22 @@ namespace Licenta.ORM
             string parameterNames = string.Join(",", columns.Select(column => string.Format("@{0}", column)));
             return string.Format(queryTemplate, tableName, columnNames, parameterNames);
         }
-
-        private T Create<T>(List<string> columns, SqlDataReader reader) where T : new()
-        {
-            var person = new T();
-
-            foreach (var column in columns)
-            {
-                PropertyInfo prop = person.GetType().GetProperty(column, BindingFlags.Public | BindingFlags.Instance);
-                if (null != prop && prop.CanWrite)
-                {
-                    prop.SetValue(person, reader[column], null);
-                }
-            }
-
-            return person;
-        }
-
+        
         public void Delete<T>(T item)
         {
-            var type = item.GetType();
-            var properties = type.GetProperties();
-
-            var tableName = type.Name;
-            var columns = properties.Select(p => p.Name).ToList();
+            var tableName = typeof(T).Name;
+            var columns = descriptor.GetPropertyNames<T>();
             var query = GetDeleteStatement(tableName, columns);
-
+            
             using (var connection = new SqlConnection(connectionString))
             using (var command = new SqlCommand(query, connection))
             {
                 connection.Open();
 
+                var properties = descriptor.GetPropertyNamesAndValues<T>(item);
                 foreach (var property in properties)
                 {
-                    object value = property.GetValue(item);
-                    command.Parameters.AddWithValue(property.Name, value);
+                    command.Parameters.AddWithValue(property.Key, property.Value);
                 }
 
                 command.ExecuteNonQuery();
