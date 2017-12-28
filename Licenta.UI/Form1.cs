@@ -1,6 +1,7 @@
 ﻿using Licenta.Data;
 using Licenta.ORM;
 using System.Configuration;
+using System.Data.SqlClient;
 using System.Windows.Forms;
 
 namespace Licenta.UI
@@ -30,6 +31,43 @@ namespace Licenta.UI
             }
 
             this.dataGridView1.DataSource = db.GetAll<Person>();
+        }
+
+        private void button2_Click(object sender, System.EventArgs e)
+        {
+            foreach(DataGridViewRow item in dataGridView1.SelectedRows)
+            {
+                var person = (Person)item.DataBoundItem;
+                Delete(person);    
+            }
+
+            this.dataGridView1.DataSource = db.GetAll<Person>();
+        }
+
+        private void Delete(Person person)
+        {
+            var connectionString = ConfigurationManager.ConnectionStrings["Licenta"].ConnectionString;
+
+            var query = 
+                @"DELETE FROM [dbo].[Person] 
+                WHERE 
+                    FirstName = @FirstName AND 
+                    LastName = @LastName AND 
+                    CardNo = @CardNo AND 
+                    DateOfBirth = @DateOfBirth";
+
+            using (var connection = new SqlConnection(connectionString))
+            using (var command = new SqlCommand(query, connection))
+            {
+                connection.Open();
+
+                command.Parameters.AddWithValue("FirstName", person.FirstName);
+                command.Parameters.AddWithValue("LastName", person.LastName);
+                command.Parameters.AddWithValue("CardNo", person.CardNo);
+                command.Parameters.AddWithValue("DateOfBirth", person.DateOfBirth);
+
+                command.ExecuteNonQuery();
+            }
         }
     }
 }
