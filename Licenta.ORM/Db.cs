@@ -14,8 +14,12 @@ namespace Licenta.ORM
             this.connectionString = connectionString;
         }
 
-        public List<T> GetList<T>(string query) where T : new()
+        public List<T> GetList<T>() where T : new()
         {
+            var tableName = typeof(T).Name;
+            var columns = typeof(T).GetProperties().Select(p => p.Name).ToList();
+            var query = GetSelectStatement(tableName, columns);
+
             var items = new List<T>();
 
             using (var connection = new SqlConnection(connectionString))
@@ -24,8 +28,6 @@ namespace Licenta.ORM
                 connection.Open();
 
                 var reader = command.ExecuteReader();
-
-                var columns = GetColumns(reader);
 
                 while (reader.Read())
                 {
@@ -36,6 +38,13 @@ namespace Licenta.ORM
             }
 
             return items;
+        }
+
+        private string GetSelectStatement(string tableName, List<string> columns)
+        {
+            string queryTemplate = "SELECT {0} FROM [dbo].[{1}]";
+            string columnNames = string.Join(",", columns.Select(column => string.Format("[{0}]", column)));
+            return string.Format(queryTemplate, columnNames, tableName);
         }
 
         public void Save<T>(T item)
@@ -67,18 +76,6 @@ namespace Licenta.ORM
             string columnNames = string.Join(",", columns.Select(column => string.Format("[{0}]", column)));
             string parameterNames = string.Join(",", columns.Select(column => string.Format("@{0}", column)));
             return string.Format(queryTemplate, tableName, columnNames, parameterNames);
-        }
-
-        private List<string> GetColumns(SqlDataReader reader)
-        {
-            var columns = new List<string>();
-
-            for (int i = 0; i < reader.FieldCount; i++)
-            {
-                columns.Add(reader.GetName(i));
-            }
-
-            return columns;
         }
 
         private T Create<T>(List<string> columns, SqlDataReader reader) where T : new()

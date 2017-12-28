@@ -19,12 +19,12 @@ namespace Licenta.Data
 
         public List<Person> GetPersons()
         {
-            return db.GetList<Person>("SELECT FirstName, LastName, DateOfBirth, CardNo FROM Person");
+            return db.GetList<Person>();
         }
 
         public List<Product> GetProducts()
         {
-            return db.GetList<Product>("SELECT Name, Price, Count FROM Product");
+            return db.GetList<Product>();
         }
 
         public void Save<T>(T item)
