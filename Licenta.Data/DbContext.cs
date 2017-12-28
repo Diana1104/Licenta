@@ -22,9 +22,9 @@ namespace Licenta.Data
             return db.GetList<Person>("SELECT FirstName, LastName, DateOfBirth, CardNo FROM Person");
         }
 
-        public List<InventoryItem> GetInventory()
+        public List<Product> GetProducts()
         {
-            return db.GetList<InventoryItem>("SELECT Name, Price, Count FROM Inventory");
+            return db.GetList<Product>("SELECT Name, Price, Count FROM Product");
         }
 
         public void Save<T>(T item)

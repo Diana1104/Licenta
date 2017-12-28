@@ -15,7 +15,7 @@ namespace Licenta.UI
             context = new DbContext();
 
             this.dataGridView1.DataSource = context.GetPersons();
-            this.dataGridView2.DataSource = context.GetInventory();
+            this.dataGridView2.DataSource = context.GetProducts();
         }
 
         private void button1_Click(object sender, System.EventArgs e)
