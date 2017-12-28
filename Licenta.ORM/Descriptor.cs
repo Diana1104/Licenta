@@ -40,5 +40,26 @@ namespace Licenta.ORM
 
             return item;
         }
+
+        public List<string> GetEncryptedPropertyNames<T>()
+        {
+            List<string> encryptedProperties = new List<string>();
+             
+            PropertyInfo[] properties = typeof(T).GetProperties();
+            foreach (PropertyInfo property in properties)
+            {
+                object[] customAttributes = property.GetCustomAttributes(true);
+                foreach (object atribute in customAttributes)
+                {
+                    var encryptedAttribute = atribute as EncryptedAttribute;
+                    if (encryptedAttribute != null)
+                    {
+                        encryptedProperties.Add(property.Name);
+                    }
+                }
+            }
+
+            return encryptedProperties;
+        }
     }
 }
