@@ -46,11 +46,11 @@ namespace Licenta.UI
             this.dataGridView1.DataSource = db.GetAll<Person>();
         }
 
-        private void Delete(Person person)
+        private void Delete<T>(T item)
         {
             var connectionString = ConfigurationManager.ConnectionStrings["Licenta"].ConnectionString;
 
-            var type = person.GetType();
+            var type = item.GetType();
             var properties = type.GetProperties();
             var tableName = type.Name;
             var columns = properties.Select(p => p.Name).ToList();
@@ -63,7 +63,7 @@ namespace Licenta.UI
 
                 foreach (var property in properties)
                 {
-                    object value = property.GetValue(person);
+                    object value = property.GetValue(item);
                     command.Parameters.AddWithValue(property.Name, value);
                 }
 
