@@ -16,11 +16,11 @@ namespace Licenta.UI
             var connectionString = ConfigurationManager.ConnectionStrings["Licenta"].ConnectionString;
             db = new Db(connectionString);
 
-            this.dataGridView1.DataSource = db.GetAll<Person>();
-            this.dataGridView2.DataSource = db.GetAll<Product>();
+            this.personsDataGridView.DataSource = db.GetAll<Person>();
+            this.productsDataGridView.DataSource = db.GetAll<Product>();
         }
 
-        private void button1_Click(object sender, System.EventArgs e)
+        private void SaveNewPerson(object sender, System.EventArgs e)
         {
             var editPersonForm = new EditPerson();
             var result = editPersonForm.ShowDialog();
@@ -29,18 +29,18 @@ namespace Licenta.UI
                 db.Save(editPersonForm.Person);
             }
 
-            this.dataGridView1.DataSource = db.GetAll<Person>();
+            this.personsDataGridView.DataSource = db.GetAll<Person>();
         }
 
-        private void button2_Click(object sender, System.EventArgs e)
+        private void DeleteSelectedPersons(object sender, System.EventArgs e)
         {
-            foreach(DataGridViewRow item in dataGridView1.SelectedRows)
+            foreach(DataGridViewRow item in personsDataGridView.SelectedRows)
             {
                 var person = (Person)item.DataBoundItem;
                 db.Delete(person);    
             }
 
-            this.dataGridView1.DataSource = db.GetAll<Person>();
+            this.personsDataGridView.DataSource = db.GetAll<Person>();
         }
     }
 }
