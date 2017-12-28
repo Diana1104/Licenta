@@ -27,11 +27,11 @@ namespace Licenta.Data
             return db.GetList<InventoryItem>("SELECT Name, Price, Count FROM Inventory");
         }
 
-        public void Save(Person person)
+        public void Save<T>(T item)
         {
             var connectionString = ConfigurationManager.ConnectionStrings["Licenta"].ConnectionString;
             
-            var type = person.GetType();
+            var type = item.GetType();
             PropertyInfo[] properties = type.GetProperties();
 
             string queryTemplate = "INSERT INTO [dbo].[{0}] ({1}) VALUES ({2})";
@@ -46,7 +46,7 @@ namespace Licenta.Data
             {
                 foreach (PropertyInfo property in properties)
                 {
-                    object value = property.GetValue(person);
+                    object value = property.GetValue(item);
                     command.Parameters.AddWithValue(property.Name, value);
                 }
 
