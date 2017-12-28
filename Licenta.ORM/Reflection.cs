@@ -5,14 +5,14 @@ using System.Reflection;
 
 namespace Licenta.ORM
 {
-    public class Descriptor
+    public class Reflection
     {
-        public List<string> GetPropertyNames<T>()
+        public static List<string> GetPropertyNames<T>()
         {
             return typeof(T).GetProperties().Select(p => p.Name).ToList();
         }
 
-        public Dictionary<string, object> GetPropertyNamesAndValues<T>(T item)
+        public static Dictionary<string, object> GetPropertyNamesAndValues<T>(T item)
         {
             var dictionary = new Dictionary<string, object>();
 
@@ -25,7 +25,7 @@ namespace Licenta.ORM
             return dictionary;
         }
 
-        public T Create<T>(List<string> columns, IDataReader reader) where T : new()
+        public static T Create<T>(List<string> columns, IDataReader reader) where T : new()
         {
             var item = new T();
 
@@ -41,7 +41,7 @@ namespace Licenta.ORM
             return item;
         }
 
-        public List<string> GetEncryptedPropertyNames<T>()
+        public static List<string> GetEncryptedPropertyNames<T>()
         {
             List<string> encryptedProperties = new List<string>();
              

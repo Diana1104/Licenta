@@ -7,18 +7,16 @@ namespace Licenta.ORM
     public class Db
     {
         private string connectionString;
-        private Descriptor descriptor;
 
         public Db(string connectionString)
         {
             this.connectionString = connectionString;
-            this.descriptor = new Descriptor();
         }
 
         public List<T> GetAll<T>() where T : new()
         {
             var tableName = typeof(T).Name;
-            var columns = descriptor.GetPropertyNames<T>();
+            var columns = Reflection.GetPropertyNames<T>();
             var query = GetSelectStatement(tableName, columns);
 
             var items = new List<T>();
@@ -32,7 +30,7 @@ namespace Licenta.ORM
 
                 while (reader.Read())
                 {
-                    var item = descriptor.Create<T>(columns, reader);
+                    var item = Reflection.Create<T>(columns, reader);
 
                     items.Add(item);
                 }
@@ -51,13 +49,13 @@ namespace Licenta.ORM
         public void Save<T>(T item)
         {
             var tableName = typeof(T).Name;
-            var columns = descriptor.GetPropertyNames<T>();
+            var columns = Reflection.GetPropertyNames<T>();
             var query = GetInsertStatement(tableName, columns);
 
             using (var connection = new SqlConnection(connectionString))
             using (var command = new SqlCommand(query, connection))
             {
-                var properties = descriptor.GetPropertyNamesAndValues<T>(item);
+                var properties = Reflection.GetPropertyNamesAndValues<T>(item);
                 foreach (var property in properties)
                 {
                     command.Parameters.AddWithValue(property.Key, property.Value);
@@ -79,7 +77,7 @@ namespace Licenta.ORM
         public void Delete<T>(T item)
         {
             var tableName = typeof(T).Name;
-            var columns = descriptor.GetPropertyNames<T>();
+            var columns = Reflection.GetPropertyNames<T>();
             var query = GetDeleteStatement(tableName, columns);
             
             using (var connection = new SqlConnection(connectionString))
@@ -87,7 +85,7 @@ namespace Licenta.ORM
             {
                 connection.Open();
 
-                var properties = descriptor.GetPropertyNamesAndValues<T>(item);
+                var properties = Reflection.GetPropertyNamesAndValues<T>(item);
                 foreach (var property in properties)
                 {
                     command.Parameters.AddWithValue(property.Key, property.Value);
