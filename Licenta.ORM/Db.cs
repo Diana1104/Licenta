@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Reflection;
 
 namespace Licenta.ORM
@@ -37,6 +38,32 @@ namespace Licenta.ORM
             return items;
         }
 
+        public void Save<T>(T item)
+        {
+            var type = item.GetType();
+            PropertyInfo[] properties = type.GetProperties();
+
+            string queryTemplate = "INSERT INTO [dbo].[{0}] ({1}) VALUES ({2})";
+            string tableName = type.Name;
+            string columnNames = string.Join(",", properties.Select(p => string.Format("[{0}]", p.Name)));
+            string parameterNames = string.Join(",", properties.Select(p => string.Format("@{0}", p.Name)));
+
+            string query = string.Format(queryTemplate, tableName, columnNames, parameterNames);
+
+            using (var connection = new SqlConnection(connectionString))
+            using (var command = new SqlCommand(query, connection))
+            {
+                foreach (PropertyInfo property in properties)
+                {
+                    object value = property.GetValue(item);
+                    command.Parameters.AddWithValue(property.Name, value);
+                }
+
+                connection.Open();
+                command.ExecuteNonQuery();
+            }
+        }
+        
         private List<string> GetColumns(SqlDataReader reader)
         {
             var columns = new List<string>();
