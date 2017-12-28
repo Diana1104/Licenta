@@ -1,9 +1,6 @@
 ﻿using Licenta.Data;
 using Licenta.ORM;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Data.SqlClient;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace Licenta.UI
@@ -40,42 +37,10 @@ namespace Licenta.UI
             foreach(DataGridViewRow item in dataGridView1.SelectedRows)
             {
                 var person = (Person)item.DataBoundItem;
-                Delete(person);    
+                db.Delete(person);    
             }
 
             this.dataGridView1.DataSource = db.GetAll<Person>();
-        }
-
-        private void Delete<T>(T item)
-        {
-            var connectionString = ConfigurationManager.ConnectionStrings["Licenta"].ConnectionString;
-
-            var type = item.GetType();
-            var properties = type.GetProperties();
-            var tableName = type.Name;
-            var columns = properties.Select(p => p.Name).ToList();
-            var query = GetDeleteStatement(tableName, columns);
-
-            using (var connection = new SqlConnection(connectionString))
-            using (var command = new SqlCommand(query, connection))
-            {
-                connection.Open();
-
-                foreach (var property in properties)
-                {
-                    object value = property.GetValue(item);
-                    command.Parameters.AddWithValue(property.Name, value);
-                }
-
-                command.ExecuteNonQuery();
-            }
-        }
-
-        private string GetDeleteStatement(string tableName, List<string> columns)
-        {
-            string queryTemplate = "DELETE FROM [dbo].[{0}] WHERE {1}";
-            string searchCondition = string.Join(" AND ", columns.Select(column => string.Format("[{0}] = @{0}", column)));
-            return string.Format(queryTemplate, tableName, searchCondition);
         }
     }
 }

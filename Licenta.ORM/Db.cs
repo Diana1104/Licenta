@@ -93,5 +93,36 @@ namespace Licenta.ORM
 
             return person;
         }
+
+        public void Delete<T>(T item)
+        {
+            var type = item.GetType();
+            var properties = type.GetProperties();
+
+            var tableName = type.Name;
+            var columns = properties.Select(p => p.Name).ToList();
+            var query = GetDeleteStatement(tableName, columns);
+
+            using (var connection = new SqlConnection(connectionString))
+            using (var command = new SqlCommand(query, connection))
+            {
+                connection.Open();
+
+                foreach (var property in properties)
+                {
+                    object value = property.GetValue(item);
+                    command.Parameters.AddWithValue(property.Name, value);
+                }
+
+                command.ExecuteNonQuery();
+            }
+        }
+
+        private string GetDeleteStatement(string tableName, List<string> columns)
+        {
+            string queryTemplate = "DELETE FROM [dbo].[{0}] WHERE {1}";
+            string searchCondition = string.Join(" AND ", columns.Select(column => string.Format("[{0}] = @{0}", column)));
+            return string.Format(queryTemplate, tableName, searchCondition);
+        }
     }
 }
