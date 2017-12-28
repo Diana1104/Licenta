@@ -1,7 +1,9 @@
 ﻿using Licenta.Data;
 using Licenta.ORM;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace Licenta.UI
@@ -48,26 +50,32 @@ namespace Licenta.UI
         {
             var connectionString = ConfigurationManager.ConnectionStrings["Licenta"].ConnectionString;
 
-            var query = 
-                @"DELETE FROM [dbo].[Person] 
-                WHERE 
-                    FirstName = @FirstName AND 
-                    LastName = @LastName AND 
-                    CardNo = @CardNo AND 
-                    DateOfBirth = @DateOfBirth";
+            var type = person.GetType();
+            var properties = type.GetProperties();
+            var tableName = type.Name;
+            var columns = properties.Select(p => p.Name).ToList();
+            var query = GetDeleteStatement(tableName, columns);
 
             using (var connection = new SqlConnection(connectionString))
             using (var command = new SqlCommand(query, connection))
             {
                 connection.Open();
 
-                command.Parameters.AddWithValue("FirstName", person.FirstName);
-                command.Parameters.AddWithValue("LastName", person.LastName);
-                command.Parameters.AddWithValue("CardNo", person.CardNo);
-                command.Parameters.AddWithValue("DateOfBirth", person.DateOfBirth);
+                foreach (var property in properties)
+                {
+                    object value = property.GetValue(person);
+                    command.Parameters.AddWithValue(property.Name, value);
+                }
 
                 command.ExecuteNonQuery();
             }
+        }
+
+        private string GetDeleteStatement(string tableName, List<string> columns)
+        {
+            string queryTemplate = "DELETE FROM [dbo].[{0}] WHERE {1}";
+            string searchCondition = string.Join(" AND ", columns.Select(column => string.Format("[{0}] = @{0}", column)));
+            return string.Format(queryTemplate, tableName, searchCondition);
         }
     }
 }
