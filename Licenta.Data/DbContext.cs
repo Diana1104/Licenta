@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
+using System.Reflection;
 
 namespace Licenta.Data
 {
@@ -28,6 +29,7 @@ namespace Licenta.Data
         public void Save(Person person)
         {
             var connectionString = ConfigurationManager.ConnectionStrings["Licenta"].ConnectionString;
+
             string query = @"
                  INSERT INTO [dbo].[Person]
                        ([FirstName]
@@ -40,13 +42,17 @@ namespace Licenta.Data
                        ,@CardNo
                        ,@DateOfBirth)";
 
+            var t = person.GetType();
+            PropertyInfo[] properties = t.GetProperties();
+            
             using (var connection = new SqlConnection(connectionString))
             using (var command = new SqlCommand(query, connection))
             {
-                command.Parameters.AddWithValue("FirstName", person.FirstName);
-                command.Parameters.AddWithValue("LastName", person.LastName);
-                command.Parameters.AddWithValue("CardNo", person.CardNo);
-                command.Parameters.AddWithValue("DateOfBirth", person.DateOfBirth);
+                foreach (PropertyInfo property in properties)
+                {
+                    object value = property.GetValue(person);
+                    command.Parameters.AddWithValue(property.Name, value);
+                }
 
                 connection.Open();
                 command.ExecuteNonQuery();
