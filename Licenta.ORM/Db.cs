@@ -97,12 +97,16 @@ namespace Licenta.ORM
 
         private byte[] Encrypt(object input)
         {
-            return Serialization.Serialize(input);   
+            var aes = new Aes();
+            var bytes = Serialization.Serialize(input);
+            return aes.Encrypt(bytes, "123");
         }
 
         private object Decrypt(byte[] input)
         {
-            return Serialization.Deserialize(input);
+            var aes = new Aes();
+            var bytes = aes.Decrypt(input, "123");
+            return Serialization.Deserialize(bytes);
         }
     }
 }
