@@ -17,7 +17,7 @@ namespace Licenta.ORM
         {
             var tableName = typeof(T).Name;
             var columns = Reflection.GetPropertyNames<T>();
-            var query = GetSelectStatement(tableName, columns);
+            var query = Sql.GetSelectStatement(tableName, columns);
 
             var items = new List<T>();
 
@@ -38,19 +38,12 @@ namespace Licenta.ORM
 
             return items;
         }
-
-        private string GetSelectStatement(string tableName, List<string> columns)
-        {
-            string queryTemplate = "SELECT {0} FROM [dbo].[{1}]";
-            string columnNames = string.Join(",", columns.Select(column => string.Format("[{0}]", column)));
-            return string.Format(queryTemplate, columnNames, tableName);
-        }
-
+        
         public void Save<T>(T item)
         {
             var tableName = typeof(T).Name;
             var columns = Reflection.GetPropertyNames<T>();
-            var query = GetInsertStatement(tableName, columns);
+            var query = Sql.GetInsertStatement(tableName, columns);
 
             using (var connection = new SqlConnection(connectionString))
             using (var command = new SqlCommand(query, connection))
@@ -65,20 +58,12 @@ namespace Licenta.ORM
                 command.ExecuteNonQuery();
             }
         }
-
-        private string GetInsertStatement(string tableName, List<string> columns)
-        {
-            string queryTemplate = "INSERT INTO [dbo].[{0}] ({1}) VALUES ({2})";
-            string columnNames = string.Join(",", columns.Select(column => string.Format("[{0}]", column)));
-            string parameterNames = string.Join(",", columns.Select(column => string.Format("@{0}", column)));
-            return string.Format(queryTemplate, tableName, columnNames, parameterNames);
-        }
         
         public void Delete<T>(T item)
         {
             var tableName = typeof(T).Name;
             var columns = Reflection.GetPropertyNames<T>();
-            var query = GetDeleteStatement(tableName, columns);
+            var query = Sql.GetDeleteStatement(tableName, columns);
             
             using (var connection = new SqlConnection(connectionString))
             using (var command = new SqlCommand(query, connection))
@@ -93,13 +78,6 @@ namespace Licenta.ORM
 
                 command.ExecuteNonQuery();
             }
-        }
-
-        private string GetDeleteStatement(string tableName, List<string> columns)
-        {
-            string queryTemplate = "DELETE FROM [dbo].[{0}] WHERE {1}";
-            string searchCondition = string.Join(" AND ", columns.Select(column => string.Format("[{0}] = @{0}", column)));
-            return string.Format(queryTemplate, tableName, searchCondition);
         }
     }
 }
