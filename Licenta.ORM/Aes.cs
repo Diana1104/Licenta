@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 
 namespace Licenta.ORM
 {
@@ -12,33 +11,21 @@ namespace Licenta.ORM
             this.configuration = configuration;
         }
 
-        public byte[] Encrypt(byte[] plainTextBytes)
+        public byte[] Encrypt(byte[] input)
         {
             using (var algorithm = GetSymmetricAlgorithm())
-            using (var encryptor = algorithm.CreateEncryptor(configuration.Key, configuration.Iv))
-            using (var memoryStream = new MemoryStream())
-            using (var cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write))
+            using (var encryptor = algorithm.CreateEncryptor(configuration.Key, configuration.Iv))            
             {
-                cryptoStream.Write(plainTextBytes, 0, plainTextBytes.Length);
-                cryptoStream.FlushFinalBlock();
-                memoryStream.Close();
-                cryptoStream.Close();
-                return memoryStream.ToArray();
+                return encryptor.TransformFinalBlock(input, 0, input.Length);
             }
         }
 
-        public byte[] Decrypt(byte[] cipherTextBytesWithSaltAndIv)
+        public byte[] Decrypt(byte[] input)
         {
             using (var algorithm = GetSymmetricAlgorithm())
             using (var decryptor = algorithm.CreateDecryptor(configuration.Key, configuration.Iv))
-            using (var memoryStream = new MemoryStream(cipherTextBytesWithSaltAndIv))
-            using (var cryptoStream = new CryptoStream(memoryStream, decryptor, CryptoStreamMode.Read))
             {
-                var plainTextBytes = new byte[cipherTextBytesWithSaltAndIv.Length];
-                var decryptedByteCount = cryptoStream.Read(plainTextBytes, 0, plainTextBytes.Length);
-                memoryStream.Close();
-                cryptoStream.Close();
-                return plainTextBytes;
+                return decryptor.TransformFinalBlock(input, 0, input.Length);                
             }
         }
 
