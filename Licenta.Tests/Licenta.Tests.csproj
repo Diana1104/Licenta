@@ -55,6 +55,7 @@
     <Compile Include="DescriptorTests.cs" />
     <Compile Include="EncryptionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SqlStatementPreparationTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Licenta.Data\Licenta.Data.csproj">
