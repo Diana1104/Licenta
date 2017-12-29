@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
@@ -43,31 +44,25 @@ namespace Licenta.ORM
             }
         }
 
-        public static AesConfiguration FromFile()
+        public static AesConfiguration FromFile(string filePath)
         {
-            if (File.Exists("crypto.config"))
+            return XmlSerialization.Deserialize<AesConfiguration>(File.ReadAllBytes(filePath));
+        }
+
+        public static void CreateDefault(string certificateThumbprint, string filePath)
+        {
+            var config = new AesConfiguration
             {
-                return XmlSerialization.Deserialize<AesConfiguration>(File.ReadAllBytes("crypto.config"));
-            }
-            else
-            {
-                string certificateThumbprint = "9bbd172d892ea5f126afab5a7440aa5ae54eac87";
+                CertificateThumbprint = certificateThumbprint,
+                BlockSize = 256,
+                CipherMode = CipherMode.CBC,
+                Padding = PaddingMode.PKCS7,
+                EncryptedKey = Encrypt(GetRandomBytes(32), certificateThumbprint),
+                EncryptedIv = Encrypt(GetRandomBytes(32), certificateThumbprint)
+            };
 
-                var config = new AesConfiguration
-                {
-                    CertificateThumbprint = certificateThumbprint,
-                    BlockSize = 256,
-                    CipherMode = CipherMode.CBC,
-                    Padding = PaddingMode.PKCS7,
-                    EncryptedKey = Encrypt(GetRandomBytes(32), certificateThumbprint),
-                    EncryptedIv = Encrypt(GetRandomBytes(32), certificateThumbprint)
-                };
-
-                byte[] bytes = XmlSerialization.Serialize(config);
-                File.WriteAllBytes("crypto.config", bytes);
-
-                return config;
-            }
+            byte[] bytes = XmlSerialization.Serialize(config);
+            File.WriteAllBytes(filePath, bytes);
         }
 
         private static byte[] GetRandomBytes(int count)

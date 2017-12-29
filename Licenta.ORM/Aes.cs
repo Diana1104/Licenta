@@ -6,7 +6,7 @@ namespace Licenta.ORM
     {
         AesConfiguration configuration;
 
-        public Aes() : this(AesConfiguration.FromFile())
+        public Aes() : this(AesConfiguration.FromFile("crypto.config"))
         {
         }
 
