@@ -48,10 +48,9 @@ namespace Licenta.ORM
             using (var connection = new SqlConnection(connectionString))
             using (var command = new SqlCommand(query, connection))
             {
-                var properties = Reflection.GetPropertyNamesAndValues<T>(item);
-                foreach (var property in properties)
-                {
-                    command.Parameters.AddWithValue(property.Key, property.Value);
+                foreach (var column in columns)
+                {                    
+                    command.Parameters.AddWithValue(column, GetValue(column, item));
                 }
 
                 connection.Open();
@@ -70,14 +69,18 @@ namespace Licenta.ORM
             {
                 connection.Open();
 
-                var properties = Reflection.GetPropertyNamesAndValues<T>(item);
-                foreach (var property in properties)
+                foreach (var column in columns)
                 {
-                    command.Parameters.AddWithValue(property.Key, property.Value);
+                    command.Parameters.AddWithValue(column, GetValue(column, item));
                 }
 
                 command.ExecuteNonQuery();
             }
+        }
+        
+        private object GetValue<T>(string propertyName, T item)
+        {
+            return Reflection.GetValue(propertyName, item);
         }
     }
 }

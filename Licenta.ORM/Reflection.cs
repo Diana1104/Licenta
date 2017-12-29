@@ -11,20 +11,7 @@ namespace Licenta.ORM
         {
             return typeof(T).GetProperties().Select(p => p.Name).ToList();
         }
-
-        public static Dictionary<string, object> GetPropertyNamesAndValues<T>(T item)
-        {
-            var dictionary = new Dictionary<string, object>();
-
-            foreach(var property in typeof(T).GetProperties())
-            {
-                object value = property.GetValue(item);
-                dictionary.Add(property.Name, value);
-            }
-
-            return dictionary;
-        }
-
+        
         public static T Create<T>(List<string> columns, IDataReader reader) where T : new()
         {
             var item = new T();
@@ -39,6 +26,11 @@ namespace Licenta.ORM
             }
 
             return item;
+        }
+                
+        public static object GetValue<T>(string propertyName, T item)
+        {
+            return typeof(T).GetProperty(propertyName).GetValue(item);
         }
 
         public static List<string> GetEncryptedPropertyNames<T>()
