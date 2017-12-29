@@ -33,25 +33,11 @@ namespace Licenta.ORM
             return typeof(T).GetProperty(propertyName).GetValue(item);
         }
 
-        public static List<string> GetEncryptedPropertyNames<T>()
+        public static bool IsEncrypted<T>(string propertyName)
         {
-            List<string> encryptedProperties = new List<string>();
-             
-            PropertyInfo[] properties = typeof(T).GetProperties();
-            foreach (PropertyInfo property in properties)
-            {
-                object[] customAttributes = property.GetCustomAttributes(true);
-                foreach (object atribute in customAttributes)
-                {
-                    var encryptedAttribute = atribute as EncryptedAttribute;
-                    if (encryptedAttribute != null)
-                    {
-                        encryptedProperties.Add(property.Name);
-                    }
-                }
-            }
-
-            return encryptedProperties;
+            var property = typeof(T).GetProperty(propertyName);
+            var attributes = property.GetCustomAttributes(true);
+            return attributes.Any(a => a is EncryptedAttribute);            
         }
     }
 }

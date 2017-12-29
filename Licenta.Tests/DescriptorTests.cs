@@ -10,8 +10,13 @@ namespace Licenta.Tests
         [TestMethod]
         public void CanDetectEncryptedProperties()
         {
-            var encryptedAttributes = Reflection.GetEncryptedPropertyNames<Person>();
-            CollectionAssert.AreEquivalent(new[] { "CardNo" }, encryptedAttributes);
+            Assert.IsTrue(Reflection.IsEncrypted<Person>("CardNo"));
+        }
+
+        [TestMethod]
+        public void CanDetectNonEncryptedProperties()
+        {
+            Assert.IsFalse(Reflection.IsEncrypted<Person>("FirstName"));
         }
     }
 }
