@@ -5,7 +5,7 @@ using Licenta.Data;
 namespace Licenta.Tests
 {
     [TestClass]
-    public class DescriptorTests
+    public class ReflectionTests
     {
         [TestMethod]
         public void CanDetectEncryptedProperties()
