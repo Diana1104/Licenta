@@ -7,11 +7,11 @@ namespace Licenta.ORM
     {
         private string connectionString;
         private Aes aes;
-
-        public Db(string connectionString, AesConfiguration aesConfiguration)
+        
+        public Db(string connectionString)
         {
             this.connectionString = connectionString;
-            this.aes = new Aes(aesConfiguration);
+            this.aes = new Aes();
         }
 
         public List<T> GetAll<T>() where T : new()

@@ -11,16 +11,7 @@ namespace Licenta.Tests
         [TestMethod]
         public void CanEncryptAndDecryptSuccessfully()
         {
-            var aesConfiguration = new AesConfiguration()
-            {
-                BlockSize = 256,
-                CipherMode = System.Security.Cryptography.CipherMode.CBC,
-                Padding = System.Security.Cryptography.PaddingMode.PKCS7,
-                Key = Convert.FromBase64String("H+dCfDa4cugB2BPAA9S2lOe7cSnXJgKPqfiDehwak2w="),
-                Iv = Convert.FromBase64String("dnyiUgfcGV9YBBafw4U3Cxqz4l6RlMI4s0pqVlWMuj8=")
-            };
-
-            var aes = new Aes(aesConfiguration);
+            var aes = new Aes();
             
             string plaintext = "plaintext";
 
