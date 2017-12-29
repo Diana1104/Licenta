@@ -18,8 +18,7 @@ namespace Licenta.UI
             
             db = new Db(connectionString);
 
-            this.personsDataGridView.DataSource = db.GetAll<Person>();
-            this.productsDataGridView.DataSource = db.GetAll<Product>();
+            this.personsDataGridView.DataSource = db.GetAll<Person>();            
         }
 
         private void SaveNewPerson(object sender, System.EventArgs e)
