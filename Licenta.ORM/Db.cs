@@ -98,14 +98,14 @@ namespace Licenta.ORM
 
         private byte[] Encrypt(object input)
         {
-            var bytes = Serialization.Serialize(input);
+            var bytes = BinarySerialization.Serialize(input);
             return aes.Encrypt(bytes);
         }
 
         private object Decrypt(byte[] input)
         {
             var bytes = aes.Decrypt(input);
-            return Serialization.Deserialize(bytes);
+            return BinarySerialization.Deserialize(bytes);
         }
     }
 }

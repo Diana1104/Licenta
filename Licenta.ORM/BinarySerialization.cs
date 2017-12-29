@@ -3,7 +3,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Licenta.ORM
 {
-    public class Serialization
+    public class BinarySerialization
     {
         static BinaryFormatter binaryFormatter = new BinaryFormatter();
 
