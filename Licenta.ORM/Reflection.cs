@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Reflection;
 
 namespace Licenta.ORM
 {
@@ -11,21 +10,10 @@ namespace Licenta.ORM
         {
             return typeof(T).GetProperties().Select(p => p.Name).ToList();
         }
-        
-        public static T Create<T>(List<string> columns, IDataReader reader) where T : new()
+
+        public static void SetValue<T>(string propertyName, T item, object value)
         {
-            var item = new T();
-
-            foreach (var column in columns)
-            {
-                PropertyInfo prop = item.GetType().GetProperty(column, BindingFlags.Public | BindingFlags.Instance);
-                if (null != prop && prop.CanWrite)
-                {
-                    prop.SetValue(item, reader[column], null);
-                }
-            }
-
-            return item;
+            typeof(T).GetProperty(propertyName).SetValue(item, value);
         }
                 
         public static object GetValue<T>(string propertyName, T item)

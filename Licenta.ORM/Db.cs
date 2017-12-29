@@ -30,7 +30,12 @@ namespace Licenta.ORM
 
                 while (reader.Read())
                 {
-                    var item = Reflection.Create<T>(columns, reader);
+                    var item = new T();
+
+                    foreach (var column in columns)
+                    {
+                        SetValue(column, item, reader[column]);
+                    }
 
                     items.Add(item);
                 }
@@ -80,7 +85,24 @@ namespace Licenta.ORM
         
         private object GetValue<T>(string propertyName, T item)
         {
-            return Reflection.GetValue(propertyName, item);
+            var value = Reflection.GetValue(propertyName, item);
+            return Reflection.IsEncrypted<T>(propertyName) ? Encrypt(value) : value;
+        }
+
+        private void SetValue<T>(string propertyName, T item, object value)
+        {
+            var normalizedValue = Reflection.IsEncrypted<T>(propertyName) ? Decrypt(value as byte[]) : value;
+            Reflection.SetValue(propertyName, item, normalizedValue);
+        }
+
+        private byte[] Encrypt(object input)
+        {
+            return Serialization.Serialize(input);   
+        }
+
+        private object Decrypt(byte[] input)
+        {
+            return Serialization.Deserialize(input);
         }
     }
 }
