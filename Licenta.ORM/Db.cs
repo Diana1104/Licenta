@@ -1,16 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Linq;
 
 namespace Licenta.ORM
 {
     public class Db
     {
         private string connectionString;
+        private Aes aes;
 
-        public Db(string connectionString)
+        public Db(string connectionString, AesConfiguration aesConfiguration)
         {
             this.connectionString = connectionString;
+            this.aes = new Aes(aesConfiguration);
         }
 
         public List<T> GetAll<T>() where T : new()
@@ -97,15 +98,13 @@ namespace Licenta.ORM
 
         private byte[] Encrypt(object input)
         {
-            var aes = new Aes();
             var bytes = Serialization.Serialize(input);
-            return aes.Encrypt(bytes, "123");
+            return aes.Encrypt(bytes);
         }
 
         private object Decrypt(byte[] input)
         {
-            var aes = new Aes();
-            var bytes = aes.Decrypt(input, "123");
+            var bytes = aes.Decrypt(input);
             return Serialization.Deserialize(bytes);
         }
     }

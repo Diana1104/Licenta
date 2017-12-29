@@ -10,15 +10,24 @@ namespace Licenta.Tests
         [TestMethod]
         public void CanEncryptAndDecryptSuccessfully()
         {
-            var aes = new Aes();
+            var aesConfiguration = new AesConfiguration()
+            {
+                Keysize = 256,
+                DerivationIterations = 1000,
+                BlockSize = 256,
+                CipherMode = System.Security.Cryptography.CipherMode.CBC,
+                Padding = System.Security.Cryptography.PaddingMode.PKCS7,
+                Password = "123"
+            };
 
-            string password = "123";
+            var aes = new Aes(aesConfiguration);
+            
             string plaintext = "plaintext";
 
             byte[] plaintextBytes = Encoding.UTF8.GetBytes(plaintext);
-            byte[] encryptedBytes = aes.Encrypt(plaintextBytes, password);
+            byte[] encryptedBytes = aes.Encrypt(plaintextBytes);
 
-            byte[] decryptedBytes = aes.Decrypt(encryptedBytes, password);
+            byte[] decryptedBytes = aes.Decrypt(encryptedBytes);
             string decryptedString = Encoding.UTF8.GetString(decryptedBytes);
 
             Assert.AreEqual(plaintext, decryptedString);

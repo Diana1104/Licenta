@@ -7,27 +7,27 @@ namespace Licenta.ORM
 {
     public class Aes
     {
-        // This constant is used to determine the keysize of the encryption algorithm in bits.
-        // We divide this by 8 within the code below to get the equivalent number of bytes.
-        private const int Keysize = 256;
+        AesConfiguration configuration;
 
-        // This constant determines the number of iterations for the password bytes generation function.
-        private const int DerivationIterations = 1000;
+        public Aes(AesConfiguration configuration)
+        {
+            this.configuration = configuration;
+        }
 
-        public byte[] Encrypt(byte[] plainTextBytes, string passPhrase)
+        public byte[] Encrypt(byte[] plainTextBytes)
         {
             // Salt and IV is randomly generated each time, but is preprended to encrypted cipher text
             // so that the same Salt and IV values can be used when decrypting.  
             var saltStringBytes = Generate256BitsOfRandomEntropy();
             var ivStringBytes = Generate256BitsOfRandomEntropy();
-            using (var password = new Rfc2898DeriveBytes(passPhrase, saltStringBytes, DerivationIterations))
+            using (var password = new Rfc2898DeriveBytes(configuration.Password, saltStringBytes, configuration.DerivationIterations))
             {
-                var keyBytes = password.GetBytes(Keysize / 8);
+                var keyBytes = password.GetBytes(configuration.Keysize / 8);
                 using (var symmetricKey = new RijndaelManaged())
                 {
-                    symmetricKey.BlockSize = 256;
-                    symmetricKey.Mode = CipherMode.CBC;
-                    symmetricKey.Padding = PaddingMode.PKCS7;
+                    symmetricKey.BlockSize = configuration.BlockSize;
+                    symmetricKey.Mode = configuration.CipherMode;
+                    symmetricKey.Padding = configuration.Padding;
                     using (var encryptor = symmetricKey.CreateEncryptor(keyBytes, ivStringBytes))
                     {
                         using (var memoryStream = new MemoryStream())
@@ -50,18 +50,18 @@ namespace Licenta.ORM
             }
         }
 
-        public byte[] Decrypt(byte[] cipherTextBytesWithSaltAndIv, string passPhrase)
+        public byte[] Decrypt(byte[] cipherTextBytesWithSaltAndIv)
         {
             // Get the saltbytes by extracting the first 32 bytes from the supplied cipherText bytes.
-            var saltStringBytes = cipherTextBytesWithSaltAndIv.Take(Keysize / 8).ToArray();
+            var saltStringBytes = cipherTextBytesWithSaltAndIv.Take(configuration.Keysize / 8).ToArray();
             // Get the IV bytes by extracting the next 32 bytes from the supplied cipherText bytes.
-            var ivStringBytes = cipherTextBytesWithSaltAndIv.Skip(Keysize / 8).Take(Keysize / 8).ToArray();
+            var ivStringBytes = cipherTextBytesWithSaltAndIv.Skip(configuration.Keysize / 8).Take(configuration.Keysize / 8).ToArray();
             // Get the actual cipher text bytes by removing the first 64 bytes from the cipherText string.
-            var cipherTextBytes = cipherTextBytesWithSaltAndIv.Skip((Keysize / 8) * 2).Take(cipherTextBytesWithSaltAndIv.Length - ((Keysize / 8) * 2)).ToArray();
+            var cipherTextBytes = cipherTextBytesWithSaltAndIv.Skip((configuration.Keysize / 8) * 2).Take(cipherTextBytesWithSaltAndIv.Length - ((configuration.Keysize / 8) * 2)).ToArray();
 
-            using (var password = new Rfc2898DeriveBytes(passPhrase, saltStringBytes, DerivationIterations))
+            using (var password = new Rfc2898DeriveBytes(configuration.Password, saltStringBytes, configuration.DerivationIterations))
             {
-                var keyBytes = password.GetBytes(Keysize / 8);
+                var keyBytes = password.GetBytes(configuration.Keysize / 8);
                 using (var symmetricKey = new RijndaelManaged())
                 {
                     symmetricKey.BlockSize = 256;

@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Aes.cs" />
+    <Compile Include="AesConfiguration.cs" />
     <Compile Include="Db.cs" />
     <Compile Include="EncryptedAttribute.cs" />
     <Compile Include="Reflection.cs" />
