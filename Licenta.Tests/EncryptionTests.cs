@@ -13,8 +13,6 @@ namespace Licenta.Tests
         {
             var aesConfiguration = new AesConfiguration()
             {
-                Keysize = 256,
-                DerivationIterations = 1000,
                 BlockSize = 256,
                 CipherMode = System.Security.Cryptography.CipherMode.CBC,
                 Padding = System.Security.Cryptography.PaddingMode.PKCS7,
